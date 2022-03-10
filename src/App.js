@@ -12,6 +12,7 @@ import {
   Link,
   Outlet,
 } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 import getConfig from './config';
 import PollingStation from './components/PollingStation';
@@ -20,6 +21,19 @@ import Home from './components/Home';
 const { networkId } = getConfig(process.env.NODE_ENV || 'development');
 
 export default function App() {
+  const changeCandidatesFunction = async (prompt) => {
+    console.log(prompt);
+    let candidateNames = await window.contract.getCandidateList({
+      prompt: prompt,
+    });
+    console.log('=>', candidateNames);
+    localStorage.setItem('Prompt', prompt);
+    candidateNames.map((candidateName) => {
+      localStorage.setItem(uuidv4(), candidateName);
+    });
+    window.location.replace(window.location.href + 'PollingStation');
+  };
+
   return (
     <Router>
       <Navbar collapseOnSelect expand='lg' bg='dark' variant='dark'>
@@ -49,7 +63,10 @@ export default function App() {
       <Routes>
         <Route path='/PollingStation' element={<PollingStation />} />
         <Route path='/NewPoll' element={<NewPoll />} />
-        <Route path='/' element={<Home />} />
+        <Route
+          path='/'
+          element={<Home changeCandidates={changeCandidatesFunction} />}
+        />
       </Routes>
     </Router>
   );

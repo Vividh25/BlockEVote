@@ -1,12 +1,25 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Container, Button } from 'react-bootstrap';
 
 const Home = (props) => {
-  const promptList = [
-    'CR Election',
-    'Corporate Election',
-    'National Elections',
-  ];
+  // const promptList = [
+  //   'CR Election',
+  //   'Corporate Election',
+  //   'National Elections',
+  //   'Who da best',
+  //   'Test4',
+  // ];
+
+  const [promptList, setPromptList] = useState([]);
+
+  useEffect(() => {
+    const showPolls = async () => {
+      let allPrompts = await window.contract.getAllPrompts();
+      setPromptList(allPrompts);
+    };
+
+    showPolls();
+  }, []);
 
   return (
     <Container>
@@ -24,7 +37,9 @@ const Home = (props) => {
               <td>{index + 1}</td>
               <td>{el}</td>
               <td>
-                <Button>Go to Polls</Button>
+                <Button onClick={() => props.changeCandidates(el)}>
+                  Go to Polls
+                </Button>
               </td>
             </tr>
           ))}

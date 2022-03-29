@@ -40,6 +40,7 @@ export async function initContract() {
         'addToPromptArray',
         'addVote',
         'recordUser',
+        'clearPromptArray',
       ],
     }
   );

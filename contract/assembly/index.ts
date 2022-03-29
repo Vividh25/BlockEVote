@@ -1,12 +1,12 @@
-import {  logging, PersistentMap} from 'near-sdk-as'
+import {  logging, PersistentMap, PersistentSet, PersistentUnorderedMap} from 'near-sdk-as'
 
 
 // const CandidateURL=new PersistentMap<string,string>("CandidateURL");
 const CandidateList=new PersistentMap<string,string[]>("Candidate List");
 const PromptArray= new PersistentMap<string,string[]>("array of prompts ");
 const VoteArray=new PersistentMap<string,i32[]>("stores votes ");
-const userParticipation = new PersistentMap<string,string[]>('user Participation Record')
-
+// const userParticipation = new PersistentMap<string,string[]>('user Participation Record')
+const userParticipation = new PersistentUnorderedMap<string, string[]>('user participation record')
 
 
 
@@ -53,7 +53,7 @@ export function getVotes(prompt:string):i32[]{
   }else{
 
     logging.log('prompt not found for this vote')
-    return[0,0]
+    return []
   }
 }
 
@@ -95,6 +95,7 @@ export function addToPromptArray(prompt:string):void{
 export function clearPromptArray():void{
   logging.log('clearing prompt array');
   PromptArray.delete("AllArrays")
+  userParticipation.clear();
 }
 
 
@@ -106,7 +107,7 @@ export function addVote(prompt:string,index:i32):void{
     tempArray[index]=newVal;
     VoteArray.set(prompt,tempArray);
   }else{
-    let newArray=[0,0];
+    let newArray: i32[] = [];
     newArray[index]=1;
     VoteArray.set(prompt,newArray);
   }

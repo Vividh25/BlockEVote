@@ -4,6 +4,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 const PollingStation = (props) => {
   const [candidateList, setCandidateList] = useState([]);
   const [promptName, setPromptName] = useState('');
+  const [voteArray, setVoteArray] = useState([]);
 
   useEffect(() => {
     const getList = async () => {
@@ -17,7 +18,41 @@ const PollingStation = (props) => {
     };
 
     getList();
+    // updateVotes();
   }, []);
+
+  const updateVotes = async () => {
+    let voteCount = await window.contract.getVotes({
+      prompt: localStorage.getItem('Prompt'),
+    });
+    console.log(voteCount);
+    setVoteArray(voteCount);
+    // console.log('Votes:', voteArray);
+  };
+
+  const addVote = async (index) => {
+    console.log('index:', index);
+
+    let userParticipation = await window.contract.didParticipate({
+      prompt: localStorage.getItem('Prompt'),
+      user: window.accountId,
+    });
+
+    if (userParticipation) {
+      console.log('You have already coted for this poll');
+    } else {
+      await window.contract.addVote({
+        prompt: localStorage.getItem('Prompt'),
+        index: index,
+      });
+
+      await window.contract.recordUser({
+        prompt: localStorage.getItem('Prompt'),
+        user: window.accountId,
+      });
+      updateVotes();
+    }
+  };
 
   // const candidateList = await window.contract.getCandidateList();
 
@@ -58,7 +93,7 @@ const PollingStation = (props) => {
             >
               {el}
             </div>
-            <Button>Vote</Button>
+            <Button onClick={() => addVote(index)}>Vote</Button>
           </Row>
         ))}
       </Container>
